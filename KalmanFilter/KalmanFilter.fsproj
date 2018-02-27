@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Data.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="KalmanFilter.fs" />
+    <Compile Include="MarketsInteractions.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Data" Version="2.4.5" />
+    <PackageReference Include="MathNet.Filtering.Kalman" Version="0.4.0" />
+    <PackageReference Include="MathNet.Numerics.FSharp" Version="3.20.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.2.3" />
+  </ItemGroup>
+
+</Project>
