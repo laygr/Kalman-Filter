@@ -14,5 +14,8 @@ module Program =
             prepareData2 csv names
             |> normalize -1.0 1.0
             |> splitData
-        MarketsInteractions.main names trainingData validationData
+        let traces, logliks = MarketsInteractions.main names trainingData validationData
+
+
+
         0 // return an integer exit code

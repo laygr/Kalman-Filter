@@ -112,8 +112,8 @@
 
         // Print interactions between pairs of stock markets
         dynamics |> Matrix.iteri (fun i j v -> 
-          if i <> j then 
+          if i <> j && (abs v > 0.2) then 
             printfn "Interaction between %s and %s: %f" 
                     names.[i] names.[j] v)
 
-        let traces, logLikelihood = expectationStep (kalmanInputFor trainingData dynamics)
+        expectationStep (kalmanInputFor trainingData dynamics)

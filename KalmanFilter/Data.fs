@@ -64,12 +64,12 @@ module Data =
         |> transpose
 
     let normalize (low:float) (high:float) (data:Matrix<float>) =
-        [ for col in [0 .. data.ColumnCount - 1] do
-            let col = data.Column(col)
-            let min, max = col.Minimum(), col.Maximum()
+        [ for rowI in [0 .. data.RowCount - 1] do
+            let row = data.Row(rowI)
+            let min, max = row.Minimum(), row.Maximum()
             yield
-                col.Map(fun v -> (high - low) * (v - min)/(max - min) + low)
-        ] |> ofColumns
+                row.Map(fun v -> (high - low) * (v - min)/(max - min) + low)
+        ] |> ofRows
         
     let splitData (historicalData:Matrix<float>) =
         // Split the data into training set and validation set
