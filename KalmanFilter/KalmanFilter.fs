@@ -20,8 +20,8 @@ module KalmanFilter =
         CovarProcessNoise : Matrix<float>       // matrix (noise Q)
         CovarMeasurementsNoise : Matrix<float>  // matrix (noise R)
     } with
-        member x.ObservedCount = x.TrainingData.RowCount
-        member x.IndexCount = x.TrainingData.ColumnCount
+        member x.ObservedCount = x.TrainingData.ColumnCount
+        member x.IndexCount = x.TrainingData.RowCount
 
     /// Represents the results of single iteration
     type KalmanTrace = {

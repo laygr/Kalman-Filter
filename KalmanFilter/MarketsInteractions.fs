@@ -1,6 +1,5 @@
 ﻿ namespace KalmanFilter
  module MarketsInteractions =
-    open Data
     open MathNet.Numerics.LinearAlgebra
     open System
     open KalmanFilter
@@ -25,7 +24,7 @@
         |> Seq.sum
 
     let expectationStep kalmanInput =
-        let kalmanTraces = kalmanFilter2 kalmanInput
+        let kalmanTraces = kalmanFilter1 kalmanInput
         let loglikelihood = logLikelihood kalmanInput kalmanTraces
         kalmanTraces, loglikelihood
  
@@ -92,7 +91,7 @@
             // Check for convergence
             let logliks = loglikelihood::logliks
             match logliks with
-            | current::past::_ when current - past < threshold -> 
+            | current::past::_ when abs(current - past ) < threshold -> 
                 newDynamics, List.rev logliks, Some iter
             | _ when iter > maxIter ->
                 newDynamics, List.rev logliks, None
@@ -102,8 +101,8 @@
         // Start the estimation with the identity matrix
         updateModel idMatrix [] 1
 
-    let main (names:string[]) trainingData validationData =
-        let dynamics, logliks, converged = fitModel trainingData 100 0.01
+    let main (names:string[]) trainingData =
+        let dynamics, logliks, converged = fitModel trainingData 1000 0.001
 
         // Report whether the training has converged
         match converged with
@@ -117,4 +116,15 @@
                     names.[i] names.[j] v)
 
         let traces, loglikelihood = expectationStep (kalmanInputFor trainingData dynamics)
-        traces, logliks
+        dynamics, traces, logliks
+
+    let predict (dynamics:Matrix<float>) (currentState:Vector<float>) =
+        dynamics * currentState
+
+    let test (data:Matrix<float>) (dynamics:Matrix<float>) =
+        // Run the E step using the calculated 'dynamics'
+        let size = data.ColumnCount
+        let observedValues = Seq.map (fun timeStep -> data.Column timeStep) [0..size-1]
+        let predictedValues = Seq.map (fun previousValue -> dynamics * previousValue) observedValues
+        Seq.skip 1 observedValues,
+        Seq.take (size-1) predictedValues

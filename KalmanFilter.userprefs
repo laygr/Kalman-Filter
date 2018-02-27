@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{9C9CE235-D18F-4553-8EA4-4CC0D1D1C04F}|Default">
+  <MonoDevelop.Ide.ItemProperties.KalmanFilter PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="KalmanFilter/Program.fs">
+    <Files>
+      <File FileName="KalmanFilter/packages.config" Line="1" Column="1" />
+      <File FileName="KalmanFilter/KalmanFilter.fs" Line="51" Column="34" />
+      <File FileName="KalmanFilter/Program.fs" Line="18" Column="34" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>
