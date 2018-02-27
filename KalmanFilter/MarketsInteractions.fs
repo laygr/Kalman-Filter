@@ -77,7 +77,7 @@
 
     /// Repeatedly runs expectation and maximization step of
     /// the EM algorithm to calculate the 'dynamics' parameter
-    let fitModel (trainingData:Matrix<float>) maxIter =
+    let fitModel (trainingData:Matrix<float>) maxIter threshold =
 
         let indexCount = trainingData.RowCount
         let idMatrix = idMatrix indexCount
@@ -92,7 +92,7 @@
             // Check for convergence
             let logliks = loglikelihood::logliks
             match logliks with
-            | current::past::_ when current - past < 0.1 -> 
+            | current::past::_ when current - past < threshold -> 
                 newDynamics, List.rev logliks, Some iter
             | _ when iter > maxIter ->
                 newDynamics, List.rev logliks, None
@@ -103,7 +103,7 @@
         updateModel idMatrix [] 1
 
     let main (names:string[]) trainingData validationData =
-        let dynamics, logliks, converged = fitModel trainingData 100
+        let dynamics, logliks, converged = fitModel trainingData 100 0.01
 
         // Report whether the training has converged
         match converged with
@@ -112,8 +112,9 @@
 
         // Print interactions between pairs of stock markets
         dynamics |> Matrix.iteri (fun i j v -> 
-          if i <> j && (abs v > 0.2) then 
-            printfn "Interaction between %s and %s: %f" 
+            if i <> j && (abs v > 0.2) then 
+                printfn "Interaction between %s and %s: %f" 
                     names.[i] names.[j] v)
 
-        expectationStep (kalmanInputFor trainingData dynamics)
+        let traces, loglikelihood = expectationStep (kalmanInputFor trainingData dynamics)
+        traces, logliks

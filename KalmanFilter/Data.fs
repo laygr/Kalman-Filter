@@ -36,14 +36,17 @@ module Data =
             name, stockData name (DateTime(2011,1,1)) DateTime.Now
         |]
 
+    let lastColumns nColumns (matrix:Matrix<float>) =
+        matrix.[0 .. , nColumns..]
+
     let prepareData (stocksData:Series[]) =
         let names = Array.map (fun (name, _) -> name) stocksData
         // Dates when data for all indices are available
         let commonDates = 
-          [ for name, index in stocksData -> 
-              // Return a set with available dates for the current index
-              set [ for item in index.Rows -> item.Date ] ]
-          |> Set.intersectMany
+            [ for name, index in stocksData -> 
+                // Return a set with available dates for the current index
+                set [ for item in index.Rows -> item.Date ] ]
+            |> Set.intersectMany
 
         // Create a matrix with historical data for available dates
         [ for name, index in stocksData ->

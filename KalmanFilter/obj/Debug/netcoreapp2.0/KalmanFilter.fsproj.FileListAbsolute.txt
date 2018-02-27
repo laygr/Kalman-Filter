@@ -1,0 +1,8 @@
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\bin\Debug\netcoreapp2.0\KalmanFilter.deps.json
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\bin\Debug\netcoreapp2.0\KalmanFilter.runtimeconfig.json
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\bin\Debug\netcoreapp2.0\KalmanFilter.runtimeconfig.dev.json
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\bin\Debug\netcoreapp2.0\KalmanFilter.dll
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\bin\Debug\netcoreapp2.0\KalmanFilter.pdb
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\obj\Debug\netcoreapp2.0\KalmanFilter.fsprojResolveAssemblyReference.cache
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\obj\Debug\netcoreapp2.0\KalmanFilter.dll
+C:\Users\laygr\source\repos\KalmanFilter\KalmanFilter\obj\Debug\netcoreapp2.0\KalmanFilter.pdb

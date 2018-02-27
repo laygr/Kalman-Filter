@@ -6,16 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Data.fs" />
     <Compile Include="Helpers.fs" />
+    <Compile Include="Data.fs" />
     <Compile Include="KalmanFilter.fs" />
     <Compile Include="MarketsInteractions.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharp.Charting.Gtk" Version="0.91.1" />
     <PackageReference Include="FSharp.Data" Version="2.4.5" />
     <PackageReference Include="MathNet.Filtering.Kalman" Version="0.4.0" />
+    <PackageReference Include="MathNet.Numerics" Version="3.20.2" />
     <PackageReference Include="MathNet.Numerics.FSharp" Version="3.20.2" />
   </ItemGroup>
 
