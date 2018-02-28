@@ -24,42 +24,45 @@
         |> Seq.sum
 
     let expectationStep kalmanInput =
-        let kalmanTraces = kalmanFilter1 kalmanInput
+        let kalmanTraces = kalmanFilter2 kalmanInput
         let loglikelihood = logLikelihood kalmanInput kalmanTraces
         kalmanTraces, loglikelihood
  
     /// Represents the 'maximization' step of the algorithm
     /// (Compute new value of parameters to maximize likelihood)
     let maximizationStep (kalmanTraces:KalmanTrace seq) (kalmanInput:KalmanInput) =
-        let dynamics = kalmanInput.StatesTransition
-        let nextValues =
-            KalmanTrace.NextValues kalmanTraces
-            |> Seq.map (fun valueAsMatrix -> valueAsMatrix.Column(0))
-        let variances =
-            KalmanTrace.NextVariances kalmanTraces
-        let observedCount = Seq.length kalmanTraces
+        if Seq.length kalmanTraces < 50
+        then kalmanInput.StatesTransition
+        else
+            let dynamics = kalmanInput.StatesTransition
+            let nextValues =
+                KalmanTrace.NextValues kalmanTraces
+                |> Seq.map (fun valueAsMatrix -> valueAsMatrix.Column(0))
+            let variances =
+                KalmanTrace.NextVariances kalmanTraces
+            let observedCount = Seq.length kalmanTraces
 
-        // Transform hidden values into a matrix & get components
-        let hiddenVals = ofColumns (Seq.toList nextValues)
-        let hiddenPrev = hiddenVals.[0 .., 0 .. observedCount - 2] 
-        let hiddenNext = hiddenVals.[0 .., 1 .. ] 
+            // Transform hidden values into a matrix & get components
+            let hiddenVals = ofColumns (Seq.toList nextValues)
+            let hiddenPrev = hiddenVals.[0 .., 0 .. observedCount - 2] 
+            let hiddenNext = hiddenVals.[0 .., 1 .. ] 
 
-        // Calculate variance between two neighboring elements
-        let crossVar = 
-            Seq.pairwise variances
-            |> Seq.map (fun (pastVar, nextVar) ->
-                (dynamics * pastVar).Transpose() * ((dynamics * pastVar) * dynamics.Transpose()).Inverse() * nextVar)
-            |> Seq.reduce (+) 
+            // Calculate variance between two neighboring elements
+            let crossVar = 
+                Seq.pairwise variances
+                |> Seq.map (fun (pastVar, nextVar) ->
+                    (dynamics * pastVar).Transpose() * ((dynamics * pastVar) * dynamics.Transpose()).Inverse() * nextVar)
+                |> Seq.reduce (+) 
 
-        // Sum variance matrices excluding the last one
-        let vars = 
-            variances 
-            |> Seq.take (observedCount - 1) |> Seq.reduce (+)
+            // Sum variance matrices excluding the last one
+            let vars = 
+                variances 
+                |> Seq.take (observedCount - 1) |> Seq.reduce (+)
 
-        // Calculate new value of 'dynamics' parameter
-        let h1 = (hiddenPrev * hiddenNext.Transpose()) + crossVar
-        let h2 = (hiddenPrev * hiddenPrev.Transpose()) + vars
-        h1.Transpose() * h2.Inverse() // new states transition
+            // Calculate new value of 'dynamics' parameter
+            let h1 = (hiddenPrev * hiddenNext.Transpose()) + crossVar
+            let h2 = (hiddenPrev * hiddenPrev.Transpose()) + vars
+            h1.Transpose() * h2.Inverse() // new states transition
 
     let kalmanInputFor (trainingData:Matrix<float>) transitionMatrix =
         let indexCount = trainingData.RowCount
@@ -111,15 +114,33 @@
 
         // Print interactions between pairs of stock markets
         dynamics |> Matrix.iteri (fun i j v -> 
-            if i <> j && (abs v > 0.2) then 
+            if (abs v) > 0.2 then //i <> j  && 
                 printfn "Interaction between %s and %s: %f" 
                     names.[i] names.[j] v)
 
         let traces, loglikelihood = expectationStep (kalmanInputFor trainingData dynamics)
         dynamics, traces, logliks
 
-    let predict (dynamics:Matrix<float>) (currentState:Vector<float>) =
-        dynamics * currentState
+    let onlineLearning data dynamics =
+        let mutable kI = kalmanInputFor data dynamics
+        let data = kI.TrainingData
+        let size = data.ColumnCount
+        let observedCount = kI.ObservedCount
+        let mutable pastValue = data.Column(0)
+        let mutable noice = kI.CovarProcessNoise
+        let mutable traces = List.empty
+        let mutable predictions = List.empty
+        for i in [0..observedCount - 1] do
+            let observedValue = data.Column(i)
+            let trace = KalmanFilter.kalmanFilter2Once kI pastValue noice observedValue
+            traces <- List.append traces [trace]
+            pastValue <- trace.UpdatedState.Column(0)
+            noice <- trace.NextVar
+            kI <- { kI with StatesTransition = maximizationStep traces kI }
+            predictions <- (kI.StatesTransition * pastValue) :: predictions
+        let observedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ObservedValue.Column(0)) traces
+        Seq.skip 1 observedValues,
+        (List.rev predictions)
 
     let test (data:Matrix<float>) (dynamics:Matrix<float>) =
         // Run the E step using the calculated 'dynamics'
@@ -127,4 +148,10 @@
         let observedValues = Seq.map (fun timeStep -> data.Column timeStep) [0..size-1]
         let predictedValues = Seq.map (fun previousValue -> dynamics * previousValue) observedValues
         Seq.skip 1 observedValues,
-        Seq.take (size-1) predictedValues
+        Seq.take size predictedValues
+
+    let testWithKalman (data:Matrix<float>) (dynamics:Matrix<float>) =
+        let traces, loglikelihood = expectationStep (kalmanInputFor data dynamics)
+        let observedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ObservedValue.Column(0)) traces
+        let predictedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ProjectedState.Column(0)) traces
+        observedValues, predictedValues

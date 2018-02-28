@@ -8,11 +8,10 @@ module Program =
     open XPlot.GoogleCharts
     open MathNet.Numerics.LinearAlgebra
 
-    let test (names:string[]) (data) (dynamics) =
+    let test (names:string[]) data dynamics =
         // Run the E step using the calculated 'dynamics'
-        let realValues, predictedValues = MarketsInteractions.test data dynamics
-        let timeSteps = [1..data.ColumnCount-1]
-
+        let realValues, predictedValues = MarketsInteractions.onlineLearning data dynamics
+        let timeSteps = [0..data.ColumnCount-1]
 
         let traces, logLiks = MarketsInteractions.expectationStep (MarketsInteractions.kalmanInputFor data dynamics)
         let chartForIndex index =
@@ -25,7 +24,7 @@ module Program =
 
             [o; f]
             |> Chart.Combo 
-            |> Chart.WithLabels ["Original"; "Fitted"]
+            |> Chart.WithLabels ["Real"; "Predicted"]
             |> Chart.WithTitle names.[index]
 
         Seq.map chartForIndex [0 .. data.RowCount-1]
@@ -39,11 +38,15 @@ module Program =
     let main argv =
         let cpiUrl = "/Users/laygr/Desktop/CPI Suecia.csv"
         let csv = CsvFile.Load(cpiUrl,hasHeaders=true)
-        let names = [| "GRCP20YY"; "BECPYOY"; "NECPIYOY"; "DNCPIYOY"; "NOCPIYOY"; "Co1"; "EURSEK" |]
-        let trainingData, validationData =
+        let names = [| "GRCP20YY"; "BECPYOY"; "NECPIYOY"; "DNCPIYOY"; "NOCPIYOY"; "Co1"; "EURSEK"; "SWCPYOY" |]
+        let fullDataUnormalized = 
             prepareData2 csv names
             |> lastColumns 100
+        let fullDataNormalized =
+            fullDataUnormalized
             |> normalize -1.0 1.0
+        let trainingData, validationData =
+            fullDataUnormalized
             |> splitData
         let dynamics, traces, logliks = MarketsInteractions.main names trainingData
         
@@ -55,6 +58,6 @@ module Program =
         |> simpleLine "Log Likelihood"
         |> Chart.Show
 
-        test names validationData dynamics
+        test names fullDataUnormalized dynamics
 
         0 // return an integer exit code

@@ -41,12 +41,12 @@ module KalmanFilter =
     let kalmanFilter1 kI =
         let k = DiscreteKalmanFilter(kI.InitialState, kI.CovarProcessNoise)
         k.Predict(kI.StatesTransition, kI.CovarProcessNoise)
-        let step observedValue pastValue =
+        let step observedValue pastValue  pastVar =
             // Calculate projected value and its variance
             // A priori estimation,
             // Covar of the error of the a priori estimation
             let projectedState, projectedVar =
-                k.Predict(kI.StatesTransition, kI.CovarProcessNoise) // don't use covarMeasurementsNoise as in tryF#
+                k.Predict(kI.StatesTransition, pastVar) // don't use covarMeasurementsNoise as in tryF#
                 k.State, k.Cov
             // Calculate projected value and its variance
             //let projectedValue = projectedState * pastValue
@@ -67,10 +67,13 @@ module KalmanFilter =
 
         // Size of the observedData matrix for future use
         seq {
+            let mutable pastVar = kI.CovarProcessNoise
             for i in [1 .. kI.ObservedCount - 1] do
                 let observedValue = ofColumns ([kI.TrainingData.Column(i)])
                 let previousValue = ofColumns ([kI.TrainingData.Column(i-1)])
-                yield (step observedValue previousValue)
+                let trace = step observedValue previousValue pastVar
+                pastVar <- trace.NextVar
+                yield trace
         }
 
     let kalmanFilter2  (kI:KalmanInput) =
@@ -105,8 +108,32 @@ module KalmanFilter =
                     ProjectedVar = projectedVar
                     ObservedValue = ofColumns [observedValue]
                     UpdatedState = ofColumns [nextValue]
-                    //NextValue = nextValue
                     NextVar = nextVar
                 }
                 kalmanFilter2' (timeStep + 1) (trace::traces)
         kalmanFilter2' 0 []
+
+    let kalmanFilter2Once (kI:KalmanInput) (pastValue:Vector<float>) (pastVar:Matrix<float>) observedValue =
+        let noiseQ = kI.CovarProcessNoise
+        let noiseR = kI.CovarMeasurementsNoise
+        let dynamics = kI.StatesTransition
+
+        // Calculate projected value and its variance
+        let projectedValue = dynamics * pastValue
+        let projectedVar = dynamics * pastVar * dynamics.Transpose() + noiseQ
+
+        // Calculate 'Kalman gain' and update the values using observed data
+        let kalmanGain = projectedVar * (projectedVar + noiseR).Inverse()
+        let update = kalmanGain * (observedValue - projectedValue)
+        let nextValue = projectedValue + update
+        let nextVar = projectedVar - kalmanGain * projectedVar |> symmetrize
+
+        // Compute the state for the next step of the iteration
+        //let logChange = logLikelihoodChange observedValue projectedValue projectedVar
+        {
+            ProjectedState = ofColumns [projectedValue]
+            ProjectedVar = projectedVar
+            ObservedValue = ofColumns [observedValue]
+            UpdatedState = ofColumns [nextValue]
+            NextVar = nextVar
+        }

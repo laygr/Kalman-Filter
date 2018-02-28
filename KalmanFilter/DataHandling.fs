@@ -37,7 +37,8 @@ module DataHandling =
         |]
 
     let lastColumns nColumns (matrix:Matrix<float>) =
-        matrix.[0 .. , nColumns..]
+        let columnCount = matrix.ColumnCount
+        matrix.[0 .. , columnCount - nColumns ..]
 
     let prepareData (stocksData:Series[]) =
         let names = Array.map (fun (name, _) -> name) stocksData
