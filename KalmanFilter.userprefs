@@ -2,7 +2,10 @@
   <MonoDevelop.Ide.ItemProperties.KalmanFilter PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="KalmanFilter/Program.fs">
     <Files>
-      <File FileName="KalmanFilter/Program.fs" Line="56" Column="13" />
+      <File FileName="KalmanFilter/Program.fs" Line="42" Column="11" />
+      <File FileName="KalmanFilter/DataHandling.fs" Line="85" Column="37" />
+      <File FileName="KalmanFilter/KalmanFilter.fs" Line="115" Column="9" />
+      <File FileName="KalmanFilter/MarketsInteractions.fs" Line="164" Column="53" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />

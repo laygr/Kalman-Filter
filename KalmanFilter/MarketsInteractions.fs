@@ -139,19 +139,26 @@
             kI <- { kI with StatesTransition = maximizationStep traces kI }
             predictions <- (kI.StatesTransition * pastValue) :: predictions
         let observedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ObservedValue.Column(0)) traces
-        Seq.skip 1 observedValues,
-        (List.rev predictions)
+        {
+            YTestV = Seq.skip 1 observedValues |> Seq.toArray
+            YPredictionV = Seq.rev predictions |> Seq.toArray
+        } : AnalyzeResults.MultipleSeries.TestOutput
 
     let test (data:Matrix<float>) (dynamics:Matrix<float>) =
         // Run the E step using the calculated 'dynamics'
         let size = data.ColumnCount
         let observedValues = Seq.map (fun timeStep -> data.Column timeStep) [0..size-1]
         let predictedValues = Seq.map (fun previousValue -> dynamics * previousValue) observedValues
-        Seq.skip 1 observedValues,
-        Seq.take size predictedValues
+        {
+            YTestV = Seq.skip 1 observedValues |> Seq.toArray
+            YPredictionV = Seq.take size predictedValues |> Seq.toArray
+        } : AnalyzeResults.MultipleSeries.TestOutput
 
     let testWithKalman (data:Matrix<float>) (dynamics:Matrix<float>) =
         let traces, loglikelihood = expectationStep (kalmanInputFor data dynamics)
         let observedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ObservedValue.Column(0)) traces
         let predictedValues = Seq.map (fun (trace:KalmanTrace) -> trace.ProjectedState.Column(0)) traces
-        observedValues, predictedValues
+        {
+            YTestV = Seq.skip 1 observedValues |> Seq.toArray
+            YPredictionV = Seq.rev predictedValues |> Seq.toArray
+        } : AnalyzeResults.MultipleSeries.TestOutput

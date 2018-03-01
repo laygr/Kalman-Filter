@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -68,11 +67,19 @@
     <Reference Include="XPlot.GoogleCharts">
       <HintPath>..\packages\XPlot.GoogleCharts.1.4.5\lib\net45\XPlot.GoogleCharts.dll</HintPath>
     </Reference>
+    <Reference Include="Deedle">
+      <HintPath>..\packages\Deedle.1.2.5\lib\net40\Deedle.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="XPlot.GoogleCharts.Deedle">
+      <HintPath>..\packages\XPlot.GoogleCharts.Deedle.1.4.5\lib\net45\XPlot.GoogleCharts.Deedle.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <None Include="packages.config" />
     <Compile Include="Helpers.fs" />
+    <Compile Include="AnalyzeResults.fs" />
     <Compile Include="DataHandling.fs" />
     <Compile Include="KalmanFilter.fs" />
     <Compile Include="MarketsInteractions.fs" />

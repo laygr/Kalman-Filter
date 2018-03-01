@@ -36,3 +36,8 @@
 /Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/Google.DataTable.Net.Wrapper.dll
 /Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/XPlot.GoogleCharts.dll
 /Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/XPlot.GoogleCharts.xml
+/Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/Deedle.dll
+/Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/XPlot.GoogleCharts.Deedle.dll
+/Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/Deedle.pdb
+/Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/Deedle.xml
+/Users/laygr/Projects/KalmanFilter/KalmanFilter/bin/Debug/XPlot.GoogleCharts.Deedle.xml
